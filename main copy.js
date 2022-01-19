@@ -20,7 +20,7 @@ reset.addEventListener('click', () => {
     time.innerText = 0;
     clearInterval(timeInterval);
 })
-function gameStart() {
+
 fetch("https://random-word-api.herokuapp.com/word?number=50")
     .then(function(response){
         return response.json();
@@ -67,7 +67,7 @@ wordInput.addEventListener("keydown", () =>{
     }
 }, 1000)
     })
-}
+
 
 
 
