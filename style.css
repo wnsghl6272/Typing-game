@@ -49,3 +49,8 @@ body {
   cursor: pointer;
   margin-top: 30px;
 }
+
+.loading {
+  background-color: grey;
+  cursor: not-allowed;
+}

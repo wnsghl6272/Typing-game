@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Game</title>
     <link rel="stylesheet" href="style.css">
-    <script src="main copy.js" defer></script>
+    <script src="main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="game-title">
         <h1>Typing Game</h1>
     </div>
     <div class="word-display">
-        This is typing Game
+        Welcome
     </div>
     <div class="word-input-box">
         <input type="text" class="word-input">
@@ -26,6 +27,6 @@
             Time : <span class="time">0</span> seconds
         </div>
     </div>
-    <button class="startButton loading">Game is loading...</button>
+    <button class="startButton loading" onclick="run()">Game is loading...</button>
 </body>
 </html>
