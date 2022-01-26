@@ -1,74 +1,113 @@
-const start = document.querySelector('.start');
-const reset = document.querySelector('.reset');
-const wordDisplay = document.querySelector('.word-display');
-const wordInput = document.querySelector('.word-input');
-const score = document.querySelector('.score');
-const time = document.querySelector('.time');
+const DEFAULT_TIME = 9;
+let score = 0;
+let time = DEFAULT_TIME;
+let isPlaying = false;
 let timeInterval;
+let words = [];
+let checkInterval;
+const random = Math.floor(Math.random() * words.length);
 
-start.addEventListener('click', () => {
-        start.style.display = "none";
-        reset.style.display = "block";
-})
+const wordInput = document.querySelector('.word-input');
+const wordDisplay = document.querySelector('.word-display');
+const button = document.querySelector('.startButton');
+const scoreDisplay = document.querySelector('.score');
+const timeDisplay = document.querySelector('.time');
 
-reset.addEventListener('click', () => {
-    wordDisplay.innerText = "";
+init();
+
+function init() {
+    buttonChange('Loading...');
+    getWords();
+    wordInput.addEventListener('input', checkMatch);
+    wordInput.disabled = true;
+}
+
+function run() {
+    if(isPlaying) {
+        return;
+    }
     wordInput.value = "";
-    start.style.display = "block";
-    reset.style.display = "none";
-    score.innerText = 0;
-    time.innerText = 0;
-    clearInterval(timeInterval);
-})
+    isPlaying = true;
+    time = DEFAULT_TIME;
+    wordInput.focus();
+    score = 0;
+    scoreDisplay.innerText = score;
+    timeInterval = setInterval(countDown, 1000);
+    checkInterval = setInterval(checkStatus, 50);
+    buttonChange('Playing...');
+    wordInput.disabled = false;
+    wordDisplay.innerText = words[random];
+}
 
-fetch("https://random-word-api.herokuapp.com/word?number=50")
-    .then(function(response){
-        return response.json();
-    })
-    .then(function(result){
-        // Loading bar
-const DEFAULT_TIME = 10;
-let wordList = result;
-let count = 0;
-let time_left = DEFAULT_TIME;
+function checkStatus() {
+    if(!isPlaying && time === 0) {
+        buttonChange('Game Start');
+        clearInterval(checkInterval);
+        wordInput.disabled = true;
+    }
+}
 
-wordDisplay.innerText = wordList[0];
-time.innerText = DEFAULT_TIME;
-
-// When user type word (count score & time reset)
-wordInput.addEventListener("keydown", () =>{
-    if (event.code === "Enter" ) {
-        if (wordInput.value === wordDisplay.innerText){
-            count++; 
-            if (count === wordList.length) {
-                wordInput.disabled = true;
-                alert("Game Over");
-                wordInput.value = "";
-                clearInterval(timeInterval);
-                return false;
-            }
-            wordDisplay.innerText = wordList[count];
-            wordInput.value = ""; 
-            score.innerText = count;
-            time.innerText = DEFAULT_TIME;
-            time_left = DEFAULT_TIME;
-        } else {
-            alert("Try Again");
+function checkMatch() {
+    if(wordInput.value.toLowerCase() === wordDisplay.innerText.toLowerCase()) {
+        wordInput.value = "";
+        if(!isPlaying) {
+            return;
         }
+        score++;
+        scoreDisplay.innerText = score;
+        time = DEFAULT_TIME;
+        const randomIndex = Math.floor(Math.random() * words.length);
+        wordDisplay.innerText = words[randomIndex];
     }
-});
+}
 
-// Set Timer setInterval(function, seconds)
- timeInterval = setInterval( () => {
-    time_left--;
-    time.innerHTML = time_left;
-    if (time_left === 0) {
-        clearInterval(timeInterval); // stop when 0 second
+function getWords() {
+    fetch("https://random-word-api.herokuapp.com/word?number=50")
+    .then((response) => response.json())
+    .then(response => {
+        words = response;
+        buttonChange('Game Start');
+    });
+
+    // response.forEach((word) => {
+    //     if(word.length < 10) {
+    //         words.push(word);
+    //     }
+    // })
+    
+    // axios.get('https://random-word-api.herokuapp.com/word?number=50')
+    // .then(function (response) {
+    //     // handle success
+
+    //     response.data.forEach((word) => {
+    //         if(word.length < 10){
+    //             words.push(word);
+    //         }
+    //     })
+
+    //     buttonChange('Game Start');
+    // })
+    // .catch(function (error) {
+    //     // handle error
+    //     console.log(error);
+    // })
+    // .then(function () {
+    //     // always executed
+    // });
+}
+
+function countDown() {
+    time > 0 ? time-- : isPlaying = false;
+    if(!isPlaying) {
+        clearInterval(timeInterval);
     }
-}, 1000)
-    })
+    timeDisplay.innerText = time;
+}
 
-
+function buttonChange(text) {
+    button.innerText = text;
+    text == 'Game Start' ? button.classList.remove('loading') : button.classList.add('loading');
+}
 
 
 
